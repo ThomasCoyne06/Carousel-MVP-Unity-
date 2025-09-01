@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class CarouselModel : MonoBehaviour
 {
-    public Action OnGoToPrevious;
-    public Action OnGoToNext;
+    public Action OnPrevious;
+    public Action OnNext;
+    public Action<int, int> OnGoTo;
 
     [SerializeField] bool canLooping;
     [SerializeField] int currentIndex;
@@ -23,22 +24,13 @@ public class CarouselModel : MonoBehaviour
         currentIndex = Mathf.Clamp(currentIndex, 0, elements.Count - 1);
     }
 
-
-    //public CarouselModel(List<GameObject> elements, int currentIndex, bool canLooping)
-    //{
-    //    this.elements = elements ?? new List<GameObject>();
-    //    this.currentIndex = currentIndex;
-    //    this.canLooping = canLooping;
-    //}
-
     public void Previous()
     {
         if (Count == 0) return;
         if (!canLooping && currentIndex == 0) return;
 
-        OnGoToPrevious?.Invoke();
-
         currentIndex = MyMath.Modulo(currentIndex - 1, Count);
+        OnPrevious?.Invoke();
     }
 
     public void Next()
@@ -46,9 +38,15 @@ public class CarouselModel : MonoBehaviour
         if (Count == 0) return;
         if (!canLooping && currentIndex == Count - 1) return;
 
-        OnGoToNext?.Invoke();
-
         currentIndex = MyMath.Modulo(currentIndex + 1, Count);
+        OnNext?.Invoke();
+    }
+
+    public void GoTo(int index)
+    {
+        if (Count == 0) return;
+        OnGoTo?.Invoke(currentIndex, index);
+        currentIndex = index;
     }
 
     public void AddElement(string element)
@@ -58,6 +56,8 @@ public class CarouselModel : MonoBehaviour
 
     public void RemoveElement(string element)
     {
+        if (Count == 0) return;
+
         elements.Remove(element);
         if (currentIndex >= Count)
         {
@@ -70,5 +70,4 @@ public class CarouselModel : MonoBehaviour
         elements.Clear();
         currentIndex = 0;
     }
-
 }

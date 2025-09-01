@@ -11,7 +11,7 @@ public abstract class CarouselView : MonoBehaviour
     //}
 
 
-    public virtual void Refresh(int currentIndex, bool canLooping)
+    public virtual void Refresh(CarouselPresenter presenter, int currentIndex, bool canLooping)
     {
 
     }
@@ -35,6 +35,11 @@ public abstract class CarouselView : MonoBehaviour
     {
 
     }
+
+
+    public abstract void UpdateGoTo(int modelPrevId, int modelNextId);
+    public abstract void UpdateButtonsGoToColor(int modelPrevId, int modelNextId);
+
 
     public abstract bool CanSwap();
 

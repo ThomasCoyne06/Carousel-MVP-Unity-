@@ -8,27 +8,16 @@ public class CarouselPresenter : MonoBehaviour
 
     private void Awake()
     {
-        model.OnGoToPrevious += () => view.UpdatePrevious(model.CanLooping);
-        model.OnGoToNext += () => view.UpdateNext(model.CanLooping);
+        model.OnPrevious += () => UpdatePrevious();
+        model.OnNext += () => UpdateNext();
+        model.OnGoTo += UpdateGoTo;
     }
 
     void Start()
     {
-        view.Refresh(model.CurrentIndex, model.CanLooping);
+        view.Refresh(this, model.CurrentIndex, model.CanLooping);
+        view.UpdateButtonsGoToColor(0, model.CurrentIndex);
     }
-
-
-    //public CarouselPresenter(CarouselModel model, CarouselView view)
-    //{
-    //    model.OnGoToPrevious += () => view.UpdatePrevious(model.Elements, model.CurrentIndex, model.CanLooping);
-    //    model.OnGoToNext += () => view.UpdateNext(model.Elements, model.CurrentIndex, model.CanLooping);
-
-    //    this.model = model;
-    //    this.view = view;
-    //    this.view.Refresh(model.Elements, model.CurrentIndex, model.CanLooping);
-    //}
-
-
 
     public void CommandPrevious()
     {
@@ -42,27 +31,32 @@ public class CarouselPresenter : MonoBehaviour
         model.Next();
     }
 
+    public void CommandGoTo(int order)
+    {
+        if (!view.CanSwap()) return;
+        model.GoTo(order);
+    }
+
     public void UpdatePrevious()
     {
         view.UpdatePrevious(model.CanLooping);
+
+        int prevId = MyMath.Modulo(model.CurrentIndex + 1, model.Count);
+        view.UpdateButtonsGoToColor(prevId, model.CurrentIndex);
     }
 
     public void UpdateNext()
     {
         view.UpdateNext(model.CanLooping);
+
+        int prevId = MyMath.Modulo(model.CurrentIndex - 1, model.Count);
+        view.UpdateButtonsGoToColor(prevId, model.CurrentIndex);
     }
 
-    int ViewToModelIndex(int currentIndex, int count, int viewIndex)
+    public void UpdateGoTo(int modelPrevId, int modelNextId)
     {
-        bool pair = count % 2 == 0;
-        int offset = pair ? 1 : 0;
-        return MyMath.Modulo(currentIndex - count / 2 + viewIndex + offset, count);
+        view.UpdateGoTo(modelPrevId, modelNextId);
+        view.UpdateButtonsGoToColor(modelPrevId, modelNextId);
     }
 
-    int ModelToViewIndex(int currentIndex, int count, int modelIndex)
-    {
-        bool pair = count % 2 == 0;
-        int offset = pair ? 1 : 0;
-        return MyMath.Modulo(modelIndex - currentIndex + count / 2 - offset, count);
-    }
 }
